@@ -4,6 +4,6 @@ import { AppContext } from "../App";
 
 export default function titleHelper(title, docTitle=null) {
     const { setTitle } = useContext(AppContext);
-    document.title = (docTitle ? docTitle : title) + " | MidoriSKY";
+    document.title = (docTitle ? docTitle : title) + " | ReclaimIt";
     setTitle(title);
 }
