@@ -20,7 +20,7 @@ function Footer() {
                         marginY: "1rem",
                     }}
                 >
-                    <Typography variant='p' color='primary' sx={{ fontWeight: 700 }}>MidoriSKY Systems</Typography>
+                    <Typography variant='p' color='primary' sx={{ fontWeight: 700 }}>ReclaimIt</Typography>
                     <Grid container spacing={2}>
 
                         <Grid item xs={12} lg={6}>
@@ -36,7 +36,7 @@ function Footer() {
                                     <Box>
                                         <Typography fontWeight={700} variant='body1'>Email</Typography>
                                         <Typography variant='body2'>
-                                            sky@midorifarm.net
+                                            contact@reclaimit.net
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -56,7 +56,7 @@ function Footer() {
                 </Container>
                 <Box sx={{ textAlign: "center", margin: "1rem" }}>
                     <Link to="/about" style={{ textDecoration: "none", color: "inherit" }}>
-                        <Typography color={"inherit"} sx={{ textAlign: "center", opacity: "0.5" }} >MidoriSKY - ECP Group 3 - 2025</Typography>
+                        <Typography color={"inherit"} sx={{ textAlign: "center", opacity: "0.5" }} >ReclaimIt - Joseph Lee - 2025</Typography>
                     </Link>
                 </Box>
             </Box>

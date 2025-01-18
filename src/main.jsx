@@ -28,9 +28,9 @@ let fonts = [
 let theme = createTheme({
   palette: {
     primary: {
-      main: "#44624a",
-      light: "#8BA888",
-      dark: "#364e3b",
+      main: "#607D8B",
+      light: "#90A4AE",
+      dark: "#455A64",
       contrastText: "#ffffff",
     },
     secondary: {
@@ -83,10 +83,10 @@ let theme = createTheme({
         {
           props: { variant: 'secondary' },
           style: {
-            color: "#44624a",
-            backgroundColor: "#44624a32",
+            color: "#607D8B",
+            backgroundColor: "#455A6432",
             '&:hover': {
-              backgroundColor: "#44624a80",
+              backgroundColor: "#607D8B80",
             },
             backdropFilter: "blur(10px)",
           },
@@ -132,7 +132,7 @@ let theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 20,
+    borderRadius: 10,
   },
 
 });

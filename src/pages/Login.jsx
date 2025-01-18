@@ -443,25 +443,6 @@ export default function Login() {
                             </CardContent>
                         </Card>
                     </Grid>
-                    <Grid item xs={12} md={12}>
-                        <Card>
-                            <CardContent>
-                                <CardTitle title="Login via other methods" icon={<KeyRoundedIcon />} />
-                                <Grid container spacing={2}>
-                                    <Grid item xs={4}>
-                                        <LoadingButton loading={loading} onClick={handlePasskeySetup} fullWidth variant="secondary" sx={{ mt: "1rem" }} startIcon={<KeyRoundedIcon />}>
-                                            Passkey
-                                        </LoadingButton>
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <LoadingButton fullWidth variant="secondary" sx={{ mt: "1rem" }} startIcon={<GoogleIcon />} loading={loading}>
-                                            Google
-                                        </LoadingButton>
-                                    </Grid>
-                                </Grid>
-                            </CardContent>
-                        </Card>
-                    </Grid>
                 </Grid>
             </Container>
             <Dialog open={resetPasswordDialog} maxWidth={"sm"} fullWidth onClose={handleResetPasswordDialogClose}>

@@ -25,7 +25,7 @@ export default function Navbar() {
                 <Toolbar>
                     <Box sx={{ flexGrow: 1, alignItems: "center", display: "flex" }}>
                         <Box sx={{ flexGrow: 1, display: ["none", "none", "flex"], alignItems: "center" }}>
-                            <Link to="/" style={{ textDecoration: 'none', color: 'white', fontWeight: 700, display: "flex", alignItems: "center" }}>MidoriSKY</Link>
+                            <Link to="/" style={{ textDecoration: 'none', color: 'white', fontWeight: 700, display: "flex", alignItems: "center" }}>ReclaimIt</Link>
                             {import.meta.env.DEV && <Chip icon={<TerminalRounded/>} label="DEV" size="small" color="warning" sx={{ ml: "1rem" }} />}
                             <Divider orientation="vertical" flexItem sx={{ mx: "1rem" }} />
                             {/* {!adminPage &&
@@ -65,7 +65,7 @@ export default function Navbar() {
             >
                 <List sx={{ width: "250px" }}>
                     <Box marginX={"1rem"} marginY={".5rem"}>
-                        <Typography variant="h6" fontWeight={700}>MidoriSKY</Typography>
+                        <Typography variant="h6" fontWeight={700}>ReclaimIt</Typography>
                         <Typography variant="body">Navigation Menu</Typography>
                     </Box>
                     <Divider sx={{ marginBottom: 1 }} />
@@ -90,7 +90,7 @@ export default function Navbar() {
             >
                 <List sx={{ width: "250px" }}>
                     <Box marginX={"1rem"} marginY={".5rem"}>
-                        <Typography variant="h6" fontWeight={700}>MidoriSKY</Typography>
+                        <Typography variant="h6" fontWeight={700}>ReclaimIt</Typography>
                         <Typography variant="body">Staff Panel</Typography>
                     </Box>
                     <Divider sx={{ my: 1 }} />
