@@ -3,12 +3,11 @@ import { useState } from 'react'
 import { Typography, Stack, IconButton, Button, Menu, ListItem, MenuItem, ListItemIcon, Divider, ListItemText } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
-import { ForestRounded, DeviceThermostatRounded, SettingsRounded, AddRounded, GrassRounded, InfoRounded, GroupRounded, PersonAddRounded, MapRounded, DashboardRounded, TaskAlt, TaskAltRounded, WarningRounded } from '@mui/icons-material';
+import { ForestRounded, DeviceThermostatRounded, SettingsRounded, AddRounded, GrassRounded, InfoRounded, GroupRounded, PersonAddRounded, MapRounded, DashboardRounded, TaskAlt, TaskAltRounded, WarningRounded, FlagRounded, CategoryRounded } from '@mui/icons-material';
 
 export default function StaffMenu(props) {
     const navigate = useNavigate()
     const [isFarmMenuOpen, setIsFarmMenuOpen] = useState(false)
-    const [isDeviceMenuOpen, setIsDeviceMenuOpen] = useState(false)
     const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false)
     const [navbarAnchorEl, setNavbarAnchorEl] = useState(null)
 
@@ -44,11 +43,6 @@ export default function StaffMenu(props) {
     const handleFarmClick = (event) => {
         setNavbarAnchorEl(event.currentTarget)
         setIsFarmMenuOpen(true)
-    }
-
-    const handleDeviceClick = (event) => {
-        setNavbarAnchorEl(event.currentTarget)
-        setIsDeviceMenuOpen(true)
     }
 
     const handleSettingsClick = (event) => {
@@ -87,7 +81,6 @@ export default function StaffMenu(props) {
         const handleResize = () => {
             if (window.innerWidth < 600) {
                 setIsFarmMenuOpen(false)
-                setIsDeviceMenuOpen(false)
                 setIsSettingsMenuOpen(false)
             }
         }
@@ -104,8 +97,7 @@ export default function StaffMenu(props) {
     return (
         <>
             <Stack direction="row" spacing={1}>
-                <Button sx={{ fontWeight: 700 }} startIcon={<ForestRounded />} variant="text" color="inherit" onClick={handleFarmClick}>Farms</Button>
-                <Button sx={{ fontWeight: 700 }} startIcon={<DeviceThermostatRounded />} variant="text" color="inherit" onClick={handleDeviceClick}>Devices</Button>
+                <Button sx={{ fontWeight: 700 }} startIcon={<CategoryRounded />} variant="text" color="inherit" onClick={handleFarmClick}>Items</Button>
                 <Button sx={{ fontWeight: 700 }} startIcon={<SettingsRounded />} variant="text" color="inherit" onClick={handleSettingsClick}>Settings</Button>
             </Stack>
             <Menu
@@ -119,78 +111,22 @@ export default function StaffMenu(props) {
                     <ListItemIcon>
                         <DashboardRounded />
                     </ListItemIcon>
-                    <ListItemText primary="Operations Overview" />
-                    <Typography variant="caption" color="text.secondary">Shift + O</Typography>
-                </MenuItem>
-                <MenuItem onClick={() => navigate("/staff/tasks")}>
-                    <ListItemIcon>
-                        <TaskAltRounded />
-                    </ListItemIcon>
-                    <ListItemText primary="My Tasks" />
-                    <Typography variant="caption" color="text.secondary">Shift + T</Typography>
+                    <ListItemText primary="Operations Overview" sx={{marginRight: "2rem"}} />
+                    <Typography variant="caption" color="text.secondary">Ctrl + Alt + O</Typography>
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={() => navigate("/staff/farms")}>
+                <MenuItem onClick={() => navigate("/staff/items")}>
                     <ListItemIcon>
-                        <ForestRounded />
+                        <FlagRounded />
                     </ListItemIcon>
-                    <ListItemText primary="Manage Farms" />
-                    <Typography variant="caption" color="text.secondary">Shift + F</Typography>
+                    <ListItemText primary="Manage Items" />
+                    <Typography variant="caption" color="text.secondary">Ctrl + Alt + I</Typography>
                 </MenuItem>
-                <MenuItem onClick={() => navigate("/staff/farms/create")}>
+                <MenuItem onClick={() => navigate("/staff/items/create")}>
                     <ListItemIcon>
                         <AddRounded />
                     </ListItemIcon>
-                    <ListItemText primary="New Farm..." />
-                </MenuItem>
-                <MenuItem onClick={() => navigate("/farms/map")}>
-                    <ListItemIcon>
-                        <MapRounded />
-                    </ListItemIcon>
-                    <ListItemText primary="Farm Map" />
-                    <Typography sx={{ marginLeft: "2rem" }} variant="caption" color="text.secondary">Shift + M</Typography>
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={() => navigate("/plots")}>
-                    <ListItemIcon>
-                        <GrassRounded />
-                    </ListItemIcon>
-                    <ListItemText primary="Manage Individual Plots" />
-                    <Typography sx={{ marginLeft: "2rem" }} variant="caption" color="text.secondary">Shift + P</Typography>
-                </MenuItem>
-                <MenuItem onClick={() => navigate("/plots/create")}>
-                    <ListItemIcon>
-                        <AddRounded />
-                    </ListItemIcon>
-                    <ListItemText primary="New Plot..." />
-                </MenuItem>
-            </Menu>
-            <Menu
-                anchorEl={navbarAnchorEl}
-                open={isDeviceMenuOpen}
-                onClose={() => setIsDeviceMenuOpen(false)}
-                onClick={() => setIsDeviceMenuOpen(false)}
-                slotProps={menuSlotProps}
-            >
-                <MenuItem onClick={() => navigate("/devices/alerts")}>
-                    <ListItemIcon>
-                        <WarningRounded />
-                    </ListItemIcon>
-                    <ListItemText primary="Device Alerts" />
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={() => navigate("/devices")}>
-                    <ListItemIcon>
-                        <DeviceThermostatRounded />
-                    </ListItemIcon>
-                    <ListItemText primary="Manage All Devices" />
-                    <Typography sx={{ marginLeft: "2rem" }} variant="caption" color="text.secondary">Shift + D</Typography>
-                </MenuItem>
-                <MenuItem onClick={() => navigate("/devices/create")}>
-                    <ListItemIcon>
-                        <AddRounded />
-                    </ListItemIcon>
-                    <ListItemText primary="New Device..." />
+                    <ListItemText primary="Add Found Item" />
                 </MenuItem>
             </Menu>
             <Menu
@@ -204,7 +140,8 @@ export default function StaffMenu(props) {
                     <ListItemIcon>
                         <GroupRounded />
                     </ListItemIcon>
-                    <ListItemText primary="Manage Users" />
+                    <ListItemText primary="Manage Users" sx={{marginRight: "2rem"}} />
+                    <Typography variant="caption" color="text.secondary">Ctrl + Alt + U</Typography>
                 </MenuItem>
                 <MenuItem onClick={() => navigate("/staff/users/create")}>
                     <ListItemIcon>
@@ -213,17 +150,11 @@ export default function StaffMenu(props) {
                     <ListItemText primary="New User..." />
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={() => navigate("/settings")}>
-                    <ListItemIcon>
-                        <SettingsRounded />
-                    </ListItemIcon>
-                    <ListItemText primary="MidoriSKY Configuration" />
-                </MenuItem>
                 <MenuItem onClick={() => navigate("/about")}>
                     <ListItemIcon>
                         <InfoRounded />
                     </ListItemIcon>
-                    <ListItemText primary="About MidoriSKY" />
+                    <ListItemText primary="About ReclaimIt" />
                 </MenuItem>
             </Menu>
         </>

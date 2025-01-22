@@ -100,29 +100,11 @@ export default function Navbar() {
                             <ListItemText primary={"Overview"} />
                         </ListItemButton>
                     </ListItem>
-                    <ListItem key={"Farms"} disablePadding>
-                        <ListItemButton LinkComponent={Link} to="/staff/tasks" onClick={() => setIsAdminDrawerOpen(false)}>
-                            <ListItemIcon><TaskAltRounded /></ListItemIcon>
-                            <ListItemText primary={"My Tasks"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem key={"Farm Map"} disablePadding>
-                        <ListItemButton LinkComponent={Link} to="/farm/map" onClick={() => setIsAdminDrawerOpen(false)}>
-                            <ListItemIcon><MapRounded /></ListItemIcon>
-                            <ListItemText primary={"Farm Map"} />
-                        </ListItemButton>
-                    </ListItem>
                     <Divider sx={{ my: 1 }} />
                     <ListItem key={"Farms"} disablePadding>
-                        <ListItemButton LinkComponent={Link} to="/staff/farms" onClick={() => setIsAdminDrawerOpen(false)}>
+                        <ListItemButton LinkComponent={Link} to="/staff/items" onClick={() => setIsAdminDrawerOpen(false)}>
                             <ListItemIcon><ForestRounded /></ListItemIcon>
-                            <ListItemText primary={"Farms"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem key={"Devices"} disablePadding>
-                        <ListItemButton onClick={() => setIsAdminDrawerOpen(false)}>
-                            <ListItemIcon><ThermostatRounded /></ListItemIcon>
-                            <ListItemText primary={"Devices"} />
+                            <ListItemText primary={"Found Items"} />
                         </ListItemButton>
                     </ListItem>
                     <ListItem key={"Users"} disablePadding>

@@ -4,8 +4,8 @@ import Test from '../Test'
 import { AppContext } from '../../App'
 import { useSnackbar } from 'notistack'
 import { Card, CardContent, Grid, Typography, ButtonBase, Stack, Chip, IconButton, Box, Skeleton } from '@mui/material'
-import {makeStyles} from '@mui/styles'
-import { AssignmentLateRounded, QueryStatsRounded, AppsRounded, TaskAltRounded, MapRounded, ForestRounded, GrassRounded, SettingsRounded, Looks3Rounded, LooksTwoRounded, LooksOneRounded, PersonRounded, GroupRounded, ContentPasteOffRounded, CloseRounded, MoreVertRounded, WarningRounded, RefreshRounded } from '@mui/icons-material'
+import { makeStyles } from '@mui/styles'
+import { AssignmentLateRounded, QueryStatsRounded, AppsRounded, TaskAltRounded, MapRounded, ForestRounded, GrassRounded, SettingsRounded, Looks3Rounded, LooksTwoRounded, LooksOneRounded, PersonRounded, GroupRounded, ContentPasteOffRounded, CloseRounded, MoreVertRounded, WarningRounded, RefreshRounded, AddRounded, FlagRounded, Visibility, VisibilityRounded, DeleteRounded } from '@mui/icons-material'
 import CardTitle from '../../components/CardTitle'
 import http from '../../http'
 import titleHelper from '../../functions/helpers';
@@ -15,6 +15,7 @@ import TaskDialog from '../../components/TaskDialog'
 import TaskPopover from '../../components/TaskPopover'
 import UserInfoPopover from '../../components/UserInfoPopover'
 import { LoadingButton } from '@mui/lab'
+import { DataGrid, GridActionsCellItem, GridToolbarExport } from '@mui/x-data-grid'
 
 export default function AdminHome() {
     //Routes for admin pages. To add authenication so that only admins can access these pages, add a check for the user's role in the UserContext
@@ -30,9 +31,15 @@ export default function AdminHome() {
     const [UserInfoPopoverOpen, setUserInfoPopoverOpen] = useState(false);
     const [UserInfoPopoverAnchorEl, setUserInfoPopoverAnchorEl] = useState(null);
     const [UserInfoPopoverUserId, setUserInfoPopoverUserId] = useState(null);
-    const [TasksLoading, setTasksLoading] = useState(false);
-    const [tasks, setTasks] = useState([]);
+    const [ItemsLoading, setItemsLoading] = useState(false);
+    const [items, setItems] = useState([]);
     const nf = new Intl.NumberFormat();
+
+    const customToolbar = () => {
+        return (
+            <GridToolbarExport />
+        );
+    }
 
     const useStyles = makeStyles(theme => ({
         outerDiv: {
@@ -41,7 +48,7 @@ export default function AdminHome() {
                     opacity: "0.15",
                     bottom: "-28px",
                     right: "-28px",
-                    rotate: "15deg"
+                    rotate: "-15deg"
                 }
             }
         },
@@ -51,7 +58,32 @@ export default function AdminHome() {
         }
     }));
 
-    const iconStyles = { position: "absolute", bottom: "-48px", right: "-48px", width: "128px", height: "128px", transition: "0.5s", display: {xs: "none", md: "initial"} }
+    const columns = [
+        { field: 'name', headerName: 'Item Name', width: 200 },
+        { field: 'description', headerName: 'Item Description', minWidth: 150, flex: 1 },
+        { field: 'created_at', headerName: 'Found On', type: 'datetime', minWidth: 150, valueGetter: (value) => new Date(value).toLocaleDateString() },
+        {
+            field: 'actions', headerName: "Actions", type: 'actions', width: 80, getActions: (params) => [
+                <GridActionsCellItem
+                    icon={<VisibilityRounded />}
+                    label="View Item"
+                    onClick={() => {
+
+                    }}
+                />,
+                <GridActionsCellItem
+                    icon={<DeleteRounded />}
+                    label="Delete Item"
+                    onClick={() => {
+                        setDeleteItem(params.row)
+                        handleDeleteItemOpen()
+                    }}
+                />
+            ]
+        },
+    ];
+
+    const iconStyles = { position: "absolute", bottom: "-48px", right: "-48px", width: "128px", height: "128px", transition: "0.5s", display: { xs: "none", md: "initial" } }
 
     const classes = useStyles();
 
@@ -73,7 +105,7 @@ export default function AdminHome() {
     const handleOnDelete = () => {
         setOptionsOpen(false)
         setDetailsDialogOpen(false)
-        handleGetTasks()
+        HandleGetItems()
     }
 
     const handleOptionsClose = () => {
@@ -136,7 +168,7 @@ export default function AdminHome() {
                 <CardContent>
                     <Stack color={"grey"} spacing={"0.5rem"} sx={{ display: "flex", justifyItems: "center", alignItems: "center" }}>
                         <ContentPasteOffRounded sx={{ height: "48px", width: "48px" }} />
-                        <Typography variant="h6" fontWeight={700}>No tasks available</Typography>
+                        <Typography variant="h6" fontWeight={700}>No items available</Typography>
                     </Stack>
                 </CardContent>
             </Card>
@@ -150,23 +182,23 @@ export default function AdminHome() {
         setUserInfoPopoverAnchorEl(e.currentTarget)
     }
 
-    const handleGetTasks = async () => {
+    const HandleGetItems = async () => {
         // Fetch all tasks
-        setTasksLoading(true)
+        setItemsLoading(true)
         var req = get({
             apiName: "midori",
-            path: "/tasks/list/outstanding",
+            path: "/admin/items/today",
         })
 
         try {
             var res = await req.response
             var data = await res.body.json()
-            setTasks(data)
-            setTasksLoading(false)
+            setItems(data)
+            setItemsLoading(false)
         } catch (err) {
             console.log(err)
-            enqueueSnackbar("Failed to get tasks", { variant: "error" })
-            setTasksLoading(false)
+            enqueueSnackbar("Failed to get items", { variant: "error" })
+            setItemsLoading(false)
         }
     }
 
@@ -174,7 +206,7 @@ export default function AdminHome() {
     useEffect(() => {
         setContainerWidth("xl")
         setAdminPage(true)
-        handleGetTasks()
+        HandleGetItems()
     }, [])
 
 
@@ -188,83 +220,35 @@ export default function AdminHome() {
                     <CardContent>
                         <CardTitle title="Staff Shortcuts" icon={<AppsRounded />} />
                         <Grid container spacing={2} mt={"0"}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} md={6}>
                                 <Card variant='draggable'>
-                                    <ButtonBase className={classes.outerDiv} component={Link} to="/staff/tasks" sx={{ width: "100%", justifyContent: 'start' }}>
+                                    <ButtonBase className={classes.outerDiv} component={Link} to="/staff/items" sx={{ width: "100%", justifyContent: 'start' }}>
                                         <CardContent sx={{ color: "primary.main" }}>
                                             <Stack direction={{ xs: "row", md: "column" }} alignItems={{ xs: "center", md: "initial" }} spacing={{ xs: "1rem", md: 1 }}>
-                                                <TaskAltRounded sx={{ width: { xs: "24px", sm: "36px" }, height: { xs: "24px", sm: "36px" } }} />
+                                                <FlagRounded sx={{ width: { xs: "24px", sm: "36px" }, height: { xs: "24px", sm: "36px" } }} />
                                                 <Box>
-                                                    <Typography variant="h6" fontWeight={700}>My Tasks</Typography>
-                                                    <Typography variant="body1" sx={{ display: { xs: "none", sm: "initial" } }}>View Assigned Tasks</Typography>
+                                                    <Typography variant="h6" fontWeight={700}>View Items</Typography>
+                                                    <Typography variant="body1" sx={{ display: { xs: "none", sm: "initial" } }}>Manage Lost & Found Items</Typography>
                                                 </Box>
                                             </Stack>
                                         </CardContent>
-                                        <TaskAltRounded className={classes.divIcon} sx={iconStyles} />
+                                        <FlagRounded className={classes.divIcon} sx={iconStyles} />
                                     </ButtonBase>
                                 </Card>
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} md={6}>
                                 <Card variant='draggable'>
-                                    <ButtonBase className={classes.outerDiv} component={Link} to="/staff/farms" sx={{ width: "100%", justifyContent: 'start' }}>
+                                    <ButtonBase className={classes.outerDiv} component={Link} to="/staff/items?new=true" sx={{ width: "100%", justifyContent: 'start' }}>
                                         <CardContent sx={{ color: "primary.main" }}>
                                             <Stack direction={{ xs: "row", md: "column" }} alignItems={{ xs: "center", md: "initial" }} spacing={{ xs: "1rem", md: 1 }}>
-                                                <MapRounded sx={{ width: { xs: "24px", sm: "36px" }, height: { xs: "24px", sm: "36px" } }} />
+                                                <AddRounded sx={{ width: { xs: "24px", sm: "36px" }, height: { xs: "24px", sm: "36px" } }} />
                                                 <Box>
-                                                    <Typography variant="h6" fontWeight={700}>Farm Map</Typography>
-                                                    <Typography variant="body1" sx={{ display: { xs: "none", sm: "initial" } }}>View Farm Map</Typography>
+                                                    <Typography variant="h6" fontWeight={700}>Create Item</Typography>
+                                                    <Typography variant="body1" sx={{ display: { xs: "none", sm: "initial" } }}>Create a Found Item</Typography>
                                                 </Box>
                                             </Stack>
                                         </CardContent>
-                                        <MapRounded className={classes.divIcon} sx={iconStyles} />
-                                    </ButtonBase>
-                                </Card>
-                            </Grid>
-                            <Grid item xs={12} sm={6} xl={4}>
-                                <Card variant='draggable'>
-                                    <ButtonBase className={classes.outerDiv} component={Link} to="/staff/farms" sx={{ width: "100%", justifyContent: 'start' }}>
-                                        <CardContent sx={{ color: "primary.main" }}>
-                                            <Stack direction={{ xs: "row", md: "column" }} alignItems={{ xs: "center", md: "initial" }} spacing={{ xs: "1rem", md: 1 }}>
-                                                <ForestRounded sx={{ width: { xs: "24px", sm: "36px" }, height: { xs: "24px", sm: "36px" } }} />
-                                                <Box>
-                                                    <Typography variant="h6" fontWeight={700}>Farms</Typography>
-                                                    <Typography variant="body1" sx={{ display: { xs: "none", sm: "initial" } }}>Manage Farms</Typography>
-                                                </Box>
-                                            </Stack>
-                                        </CardContent>
-                                        <ForestRounded className={classes.divIcon} sx={iconStyles} />
-                                    </ButtonBase>
-                                </Card>
-                            </Grid>
-                            <Grid item xs={12} sm={6} xl={4}>
-                                <Card variant='draggable'>
-                                    <ButtonBase className={classes.outerDiv} component={Link} to="/staff/plots" sx={{ width: "100%", justifyContent: 'start' }}>
-                                        <CardContent sx={{ color: "primary.main" }}>
-                                            <Stack direction={{ xs: "row", md: "column" }} alignItems={{ xs: "center", md: "initial" }} spacing={{ xs: "1rem", md: 1 }}>
-                                                <GrassRounded sx={{ width: { xs: "24px", sm: "36px" }, height: { xs: "24px", sm: "36px" } }} />
-                                                <Box>
-                                                    <Typography variant="h6" fontWeight={700}>Plots</Typography>
-                                                    <Typography variant="body1" sx={{ display: { xs: "none", sm: "initial" } }}>Manage Farm Plots</Typography>
-                                                </Box>
-                                            </Stack>
-                                        </CardContent>
-                                        <GrassRounded className={classes.divIcon} sx={iconStyles} />
-                                    </ButtonBase>
-                                </Card>
-                            </Grid>
-                            <Grid item xs={12} sm={12} xl={4}>
-                                <Card variant='draggable'>
-                                    <ButtonBase className={classes.outerDiv} component={Link} to="/staff/shop" sx={{ width: "100%", justifyContent: 'start' }}>
-                                        <CardContent sx={{ color: "primary.main" }}>
-                                            <Stack direction={{ xs: "row", md: "column" }} alignItems={{ xs: "center", md: "initial" }} spacing={{ xs: "1rem", md: 1 }}>
-                                                <SettingsRounded sx={{ width: { xs: "24px", sm: "36px" }, height: { xs: "24px", sm: "36px" } }} />
-                                                <Box>
-                                                    <Typography variant="h6" fontWeight={700}>Configure</Typography>
-                                                    <Typography variant="body1" sx={{ display: { xs: "none", sm: "initial" } }}>Configure MidoriSKY</Typography>
-                                                </Box>
-                                            </Stack>
-                                        </CardContent>
-                                        <SettingsRounded className={classes.divIcon} sx={iconStyles} />
+                                        <AddRounded className={classes.divIcon} sx={iconStyles} />
                                     </ButtonBase>
                                 </Card>
                             </Grid>
@@ -273,72 +257,28 @@ export default function AdminHome() {
                     </CardContent>
                 </Card>
                 <Grid container spacing={2} mt={"0.5rem"}>
-                    <Grid item xs={12} md={6} xl={4}>
+                    <Grid item xs={12}>
                         <Card>
                             <CardContent>
                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <CardTitle title="My To-Dos" icon={<AssignmentLateRounded />} />
-                                    <LoadingButton onClick={handleGetTasks} loading={TasksLoading} variant="text" startIcon={<RefreshRounded />} loadingPosition='start' size='small'>Refresh</LoadingButton>
+                                    <CardTitle title="Items Found Today" icon={<AssignmentLateRounded />} />
+                                    <LoadingButton onClick={HandleGetItems} loading={ItemsLoading} variant="text" startIcon={<RefreshRounded />} loadingPosition='start' size='small'>Refresh</LoadingButton>
                                 </Box>
-                                <Stack direction="column" spacing={"1rem"} mt={"1rem"}>
-                                    {(!TasksLoading && tasks.length === 0) && (
-                                        generateNoTasks()
-                                    )}
-                                    {TasksLoading && generateSkeletons()}
-                                    {!TasksLoading && tasks.map(task => (
-                                        generateTask(task)
-                                    ))}
-                                </Stack>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} md={6} xl={4}>
-                        <Card>
-                            <CardContent>
-                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <CardTitle title="Device Alerts" icon={<WarningRounded />} />
-                                    <LoadingButton startIcon={<RefreshRounded />} loadingPosition='start' size='small'>Refresh</LoadingButton>
-                                </Box>
-                                <Grid container spacing={2} mt={"0"}>
-                                    <Grid item xs={12}>
-                                        <Card variant='draggable'>
-                                            <CardContent>
-                                                <Stack color={"grey"} spacing={"0.5rem"} sx={{ display: "flex", justifyItems: "center", alignItems: "center" }}>
-                                                    <CloseRounded sx={{ height: "48px", width: "48px" }} />
-                                                    <Typography variant="h6" fontWeight={700}>Not Implemented</Typography>
-                                                </Stack>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                </Grid>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} xl={4}>
-                        <Card>
-                            <CardContent>
-                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <CardTitle title="General Statistics" icon={<QueryStatsRounded />} />
-                                    <LoadingButton startIcon={<RefreshRounded />} loadingPosition='start' size='small'>Refresh</LoadingButton>
-                                </Box>
-                                <Grid container spacing={2} mt={"0"}>
-                                    <Grid item xs={12}>
-                                        <Card variant='draggable'>
-                                            <CardContent>
-                                                <Stack color={"grey"} spacing={"0.5rem"} sx={{ display: "flex", justifyItems: "center", alignItems: "center" }}>
-                                                    <CloseRounded sx={{ height: "48px", width: "48px" }} />
-                                                    <Typography variant="h6" fontWeight={700}>Not Implemented</Typography>
-                                                </Stack>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                </Grid>
+                                <DataGrid
+                                    rows={items}
+                                    columns={columns}
+                                    pageSize={10}
+                                    loading={ItemsLoading}
+                                    autoHeight
+                                    slots={{ toolbar: customToolbar }}
+                                    sx={{ mt: "1rem" }}
+                                />
                             </CardContent>
                         </Card>
                     </Grid>
                 </Grid>
             </Box >
-            <TaskDialog open={detailsDialogOpen} onClose={handleDetailsClose} taskId={detailsId} onDelete={handleOnDelete} onUpdate={handleGetTasks} />
+            <TaskDialog open={detailsDialogOpen} onClose={handleDetailsClose} taskId={detailsId} onDelete={handleOnDelete} onUpdate={HandleGetItems} />
             <TaskPopover open={optionsOpen} anchorEl={anchorEl} onClose={handleOptionsClose} onTaskDetailsClick={() => { setDetailsDialogOpen(true); handleOptionsClose() }} onDelete={handleOnDelete} taskId={detailsId} />
             <UserInfoPopover open={UserInfoPopoverOpen} anchor={UserInfoPopoverAnchorEl} onClose={() => setUserInfoPopoverOpen(false)} userId={UserInfoPopoverUserId} />
         </>
