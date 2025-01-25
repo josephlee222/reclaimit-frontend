@@ -113,7 +113,7 @@ let theme = createTheme({
         {
           props: { variant: 'outlined' },
           style: {
-            backgroundColor: "#ffffff",
+            backgroundColor: "transparent",
             border: "1px solid lightgrey",
             borderRadius: 10,
           },
