@@ -16,6 +16,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { FilePond, registerPlugin } from 'react-filepond';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import 'filepond/dist/filepond.min.css';
 import CardTitle from '../../../components/CardTitle';
@@ -41,6 +42,7 @@ function ViewItems() {
     titleHelper("Manage Items")
 
     registerPlugin(FilePondPluginImagePreview);
+    registerPlugin(FilePondPluginFileValidateType);
 
     const columns = [
         { field: 'name', headerName: 'Item Name', width: 200 },
@@ -285,6 +287,7 @@ function ViewItems() {
                                 onChange={createItemFormik.handleChange}
                                 error={createItemFormik.touched.name && Boolean(createItemFormik.errors.name)}
                                 helperText={createItemFormik.touched.name && createItemFormik.errors.name}
+                                readonly={createLoading}
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12, sm: 6 }}>
@@ -299,6 +302,7 @@ function ViewItems() {
                                 onChange={createItemFormik.handleChange}
                                 error={createItemFormik.touched.categoryId && Boolean(createItemFormik.errors.categoryId)}
                                 helperText={createItemFormik.touched.categoryId && createItemFormik.errors.categoryId}
+                                readonly={createLoading}
                             >
                                 {category && category.map((cat) => (
                                     <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
@@ -318,6 +322,7 @@ function ViewItems() {
                                 onChange={createItemFormik.handleChange}
                                 error={createItemFormik.touched.description && Boolean(createItemFormik.errors.description)}
                                 helperText={createItemFormik.touched.description && createItemFormik.errors.description}
+                                readonly={createLoading}
                             />
                         </Grid2>
                         <Grid2 size={{ xs: 12 }}>
@@ -340,6 +345,8 @@ function ViewItems() {
                                 allowProcess={false}
                                 allowReplace={false}
                                 allowReorder={true}
+                                acceptedFileTypes={['image/*']}
+                                disabled={createLoading}
                                 imagePreviewMaxHeight={200}
                                 server={{
                                     url: filepondUrl,

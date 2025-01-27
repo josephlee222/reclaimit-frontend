@@ -96,14 +96,6 @@ export default function NavbarProfile() {
                     </Box>
                 </MenuItem>
                 <Divider />
-                <MenuItem component={Link} to="/cart" sx={{ display: { xs: "flex", md: "none" } }}>
-                    <ListItemIcon><ShoppingCartRounded /></ListItemIcon>
-                    <ListItemText primary={"Cart"} />
-                </MenuItem>
-                <MenuItem component={Link} to="/groupList" sx={{ display: { xs: "flex", md: "none" } }}>
-                    <ListItemIcon><Diversity3Rounded /></ListItemIcon>
-                    <ListItemText primary={"Friends & Groups"} />
-                </MenuItem>
                 {isStaff &&
                     <MenuItem component={Link} to="/staff">
                         <ListItemIcon><AdminPanelSettingsIcon /></ListItemIcon>

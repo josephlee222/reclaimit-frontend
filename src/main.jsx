@@ -91,6 +91,17 @@ let theme = createTheme({
             backdropFilter: "blur(10px)",
           },
         },
+        {
+          props: { variant: 'white' },
+          style: {
+            color: "#607D8B",
+            backgroundColor: "white",
+            '&:hover': {
+              backgroundColor: "#f0f0f0",
+            },
+            backdropFilter: "blur(10px)",
+          },
+        },
       ]
     },
     MuiDialogTitle: {

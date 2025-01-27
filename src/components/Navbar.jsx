@@ -6,7 +6,7 @@ import { AppContext } from "../App";
 import NavbarProfile from "./NavbarProfile";
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 import NavbarNotifications from "./NavbarNotifications";
-import { BackpackRounded, CardMembershipRounded, CelebrationRounded, DashboardRounded, DeviceThermostatRounded, ForestRounded, GroupRounded, InfoRounded, LogoutRounded, LoyaltyRounded, MapRounded, MenuRounded, PersonRounded, QuestionAnswerRounded, Settings, SettingsRounded, StorefrontRounded, TaskAltRounded, TerminalRounded, ThermostatRounded } from "@mui/icons-material";
+import { BackpackRounded, CardMembershipRounded, CelebrationRounded, DashboardRounded, DeviceThermostatRounded, FlagRounded, ForestRounded, GroupRounded, InfoRounded, LogoutRounded, LoyaltyRounded, MapRounded, MenuRounded, PersonRounded, QuestionAnswerRounded, SearchRounded, Settings, SettingsRounded, StorefrontRounded, TaskAltRounded, TerminalRounded, ThermostatRounded } from "@mui/icons-material";
 import { HomeRounded } from "@mui/icons-material";
 import NavbarFriends from "./NavbarFriends";
 import NavbarCart from "./NavbarCart";
@@ -28,13 +28,12 @@ export default function Navbar() {
                             <Link to="/" style={{ textDecoration: 'none', color: 'white', fontWeight: 700, display: "flex", alignItems: "center" }}>ReclaimIt</Link>
                             {import.meta.env.DEV && <Chip icon={<TerminalRounded/>} label="DEV" size="small" color="warning" sx={{ ml: "1rem" }} />}
                             <Divider orientation="vertical" flexItem sx={{ mx: "1rem" }} />
-                            {/* {!adminPage &&
+                            {!adminPage &&
                                 <Stack direction="row" spacing={1}>
-                                    <Button sx={{ fontWeight: 700 }} startIcon={<CelebrationRounded />} LinkComponent={Link} variant="text" color="inherit" to="/activityList">All Experiences</Button>
-                                    <Button sx={{ fontWeight: 700 }} startIcon={<LoyaltyRounded />} LinkComponent={Link} variant="text" color="inherit" to="/fou">Friends Of UPLay</Button>
-                                    <Button sx={{ fontWeight: 700 }} startIcon={<QuestionAnswerRounded />} LinkComponent={Link} variant="text" color="inherit" to="/faq">FAQ</Button>
+                                    <Button sx={{ fontWeight: 700 }} startIcon={<HomeRounded />} LinkComponent={Link} variant="text" color="inherit" to="/">Home</Button>
+                                    <Button sx={{ fontWeight: 700 }} startIcon={<SearchRounded />} LinkComponent={Link} variant="text" color="inherit" to="/items">Search Items</Button>
                                 </Stack>
-                            } */}
+                            }
 
                             {adminPage && <StaffMenu />}
                         </Box>
@@ -76,9 +75,9 @@ export default function Navbar() {
                         </ListItemButton>
                     </ListItem>
                     <ListItem key={"About Us"} disablePadding>
-                        <ListItemButton LinkComponent={Link} to="/about-farm" onClick={() => setIsDrawerOpen(false)}>
-                            <ListItemIcon><InfoRounded /></ListItemIcon>
-                            <ListItemText primary={"About Farm"} />
+                        <ListItemButton LinkComponent={Link} to="/items" onClick={() => setIsDrawerOpen(false)}>
+                            <ListItemIcon><SearchRounded /></ListItemIcon>
+                            <ListItemText primary={"Search Items"} />
                         </ListItemButton>
                     </ListItem>
                 </List>
