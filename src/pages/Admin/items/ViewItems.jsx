@@ -97,17 +97,6 @@ function ViewItems() {
                 var data = await res.body.json()
                 // upload images using filepond via API env (/admin/items/{id}/attachments)
                 setFilepondUrl(import.meta.env.VITE_API_URL + "/admin/items/" + data.id + "/attachments")
-
-                if (newItemFiles.length === 0) {
-                    enqueueSnackbar("Item created successfully", { variant: "success" })
-                    setCreateLoading(false)
-                    // clear form
-                    createItemFormik.resetForm()
-                    setNewItemFiles([])
-                    handleNewClose()
-                    handleGetItems()
-                }
-
                 filepondRef.current.processFiles().then(() => {
                     console.log("Files processed")
                     enqueueSnackbar("Item created successfully", { variant: "success" })
