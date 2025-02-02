@@ -4,12 +4,9 @@ import { useState, useContext } from "react"
 import LoginIcon from '@mui/icons-material/LoginRounded';
 import { AppContext } from "../App";
 import NavbarProfile from "./NavbarProfile";
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 import NavbarNotifications from "./NavbarNotifications";
-import { BackpackRounded, CardMembershipRounded, CelebrationRounded, DashboardRounded, DeviceThermostatRounded, FlagRounded, ForestRounded, GroupRounded, InfoRounded, LogoutRounded, LoyaltyRounded, MapRounded, MenuRounded, PersonRounded, QuestionAnswerRounded, SearchRounded, Settings, SettingsRounded, StorefrontRounded, TaskAltRounded, TerminalRounded, ThermostatRounded } from "@mui/icons-material";
+import { DashboardRounded, ForestRounded, LogoutRounded, MenuRounded, PersonRounded, SearchRounded, SettingsRounded, TerminalRounded } from "@mui/icons-material";
 import { HomeRounded } from "@mui/icons-material";
-import NavbarFriends from "./NavbarFriends";
-import NavbarCart from "./NavbarCart";
 import StaffMenu from "./StaffMenu";
 
 

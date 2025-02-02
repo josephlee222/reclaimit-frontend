@@ -22,12 +22,8 @@ import http from "../../http";
 import md5 from "md5";
 
 import ViewProfile from './ViewProfile'
-import ViewBookings from './ViewBookings'
-import ViewWallet from './ViewWallet'
 import ViewSecurity from './ViewSecurity'
-import ViewTransactions from './ViewTransactions'
 import EditProfile from './EditProfile'
-import ViewPasskeys from './ViewPasskeys'
 
 export const ProfileContext = createContext(null);
 
@@ -152,8 +148,6 @@ export default function ProfileRoutes() {
                             <CardContent>
                                 <Box sx={{ alignItems: "center", overflowX: "auto", whiteSpace: "nowrap" }}>
                                     <Button variant={activePage == 1 ? "contained" : "secondary"} startIcon={<BadgeRoundedIcon />} sx={{ mr: ".5rem", fontWeight: 700 }} LinkComponent={Link} to="/profile">Profile Information</Button>
-                                    {/* <Button variant={activePage == 2 ? "contained" : "secondary"} startIcon={<TodayRoundedIcon />} sx={{ mr: ".5rem", fontWeight: 700 }} LinkComponent={Link} to="/profile/bookings">Bookings</Button>
-                                    <Button variant={activePage == 3 ? "contained" : "secondary"} startIcon={<AccountBalanceWalletRoundedIcon />} sx={{ mr: ".5rem", fontWeight: 700 }} LinkComponent={Link} to="/profile/wallet">Wallet & Gifts</Button> */}
                                     <Button variant={activePage == 4 ? "contained" : "secondary"} startIcon={<SecurityRoundedIcon />} sx={{ fontWeight: 700 }} LinkComponent={Link} to="/profile/security">Account Security</Button>
                                 </Box>
                             </CardContent>
@@ -161,11 +155,7 @@ export default function ProfileRoutes() {
                         <Routes>
                             <Route path="*" element={<NotFound />} />
                             <Route path="/" element={<ViewProfile />} />
-                            {/* <Route path="/bookings" element={<ViewBookings />} />
-                            <Route path="/wallet" element={<ViewWallet />} /> */}
                             <Route path="/security" element={<ViewSecurity />} />
-                            <Route path="/transactions" element={<ViewTransactions />} />
-                            {/* <Route path="/passkeys" element={<ViewPasskeys />} /> */}
                             <Route path="/edit" element={<EditProfile />} />
                         </Routes>
                     </Grid>

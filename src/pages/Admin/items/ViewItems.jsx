@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import { AddRounded, CloseRounded, RefreshRounded, UploadFileRounded, VisibilityRounded } from '@mui/icons-material';
 import titleHelper from '../../../functions/helpers';
-import { get, post } from "aws-amplify/api";
+import { get, post, del } from "aws-amplify/api";
 import { enqueueSnackbar } from 'notistack';
 import { CategoryContext } from './ItemRoutes';
 import { useFormik } from 'formik';
@@ -20,6 +20,7 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import 'filepond/dist/filepond.min.css';
 import CardTitle from '../../../components/CardTitle';
+import ItemDialog from '../../../components/ItemDialog';
 
 function ViewItems() {
 
@@ -35,6 +36,8 @@ function ViewItems() {
     const [deleteItem, setDeleteItem] = useState(null)
     const [newItemFiles, setNewItemFiles] = useState([])
     const [filepondToken, setFilepondToken] = useState(null)
+    const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
+    const [detailsId, setDetailsId] = useState(null)
     const { setActivePage } = useContext(CategoryContext)
     const filepondRef = useRef(null)
     const navigate = useNavigate()
@@ -47,6 +50,7 @@ function ViewItems() {
     const columns = [
         { field: 'name', headerName: 'Item Name', width: 200 },
         { field: 'description', headerName: 'Item Description', minWidth: 150, flex: 1 },
+        { field: 'categoryName', headerName: 'Item Category', minWidth: 150 },
         { field: 'created_at', headerName: 'Found On', type: 'datetime', minWidth: 150, valueGetter: (value) => new Date(value).toLocaleDateString() },
         {
             field: 'actions', headerName: "Actions", type: 'actions', width: 80, getActions: (params) => [
@@ -54,7 +58,7 @@ function ViewItems() {
                     icon={<VisibilityRounded />}
                     label="View Item"
                     onClick={() => {
-
+                        handleDetailsOpen(params.row.id)
                     }}
                 />,
                 <GridActionsCellItem
@@ -139,15 +143,37 @@ function ViewItems() {
         setCreateDialogOpen(true)
     }
 
-    const handleDeleteItem = () => {
-        setDeactivateLoading(true)
-        http.delete("/admin/items/" + deleteItem.id).then((res) => {
-            if (res.status === 200) {
-                setDeleteLoading(false)
-                setDeleteFarmDialog(false)
-                handleGetItems()
-            }
+    const handleDetailsClose = () => {
+        setDetailsDialogOpen(false)
+    }
+
+    const handleDetailsOpen = (id) => {
+        setDetailsId(id)
+        setDetailsDialogOpen(true)
+    }
+
+    const handleOnDelete = () => {
+        handleGetItems()
+    }
+
+    const handleDeleteItem = async () => {
+        setDeleteLoading(true)
+        var itemReq = del({
+            apiName: "midori",
+            path: "/admin/items/" + deleteItem.id,
         })
+
+        try {
+            var res = await itemReq.response
+            enqueueSnackbar("Item deleted successfully", { variant: "success" })
+            setDeleteLoading(false)
+            handleDeleteItemClose()
+            handleGetItems()
+        } catch (err) {
+            console.log(err)
+            enqueueSnackbar("Failed to delete item", { variant: "error" })
+            setDeleteLoading(false)
+        }
     }
 
     const handleGetCategories = async () => {
@@ -171,7 +197,7 @@ function ViewItems() {
         setLoading(true)
         var itemReq = get({
             apiName: "midori",
-            path: "/admin/items",
+            path: "/items",
         })
 
         try {
@@ -182,6 +208,7 @@ function ViewItems() {
         } catch (err) {
             console.log(err)
             enqueueSnackbar("Failed to load items", { variant: "error" })
+            setLoading(false)
         }
     }
 
@@ -351,6 +378,7 @@ function ViewItems() {
                     </Grid2>
                 </DialogContent>
             </Dialog>
+            <ItemDialog open={detailsDialogOpen} onClose={handleDetailsClose} itemId={detailsId} onDelete={handleOnDelete} onUpdate={handleGetItems} />
         </>
     )
 }

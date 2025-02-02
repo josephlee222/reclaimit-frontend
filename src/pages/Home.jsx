@@ -6,6 +6,7 @@ import { CategoryRounded, HomeRounded, InfoRounded, LoginRounded, NewReleasesRou
 import titleHelper from '../functions/helpers';
 import { useSnackbar } from "notistack";
 import CardTitle from '../components/CardTitle';
+import { get } from 'aws-amplify/api';
 
 
 function Home() {
@@ -16,7 +17,32 @@ function Home() {
     const [banners, setBanners] = useState({})
     const [loading, setLoading] = useState(false)
     const { enqueueSnackbar } = useSnackbar();
+    const [items, setItems] = useState([])
     const theme = useTheme()
+    const bucket_url = import.meta.env.VITE_BUCKET_URL
+
+
+    const handleGetItems = async () => {
+        setLoading(true)
+        var itemReq = get({
+            apiName: "midori",
+            path: "/items?limit=3&attach=true",
+        })
+
+        try {
+            var res = await itemReq.response
+            var data = await res.body.json()
+            setItems(data)
+            setLoading(false)
+        } catch (err) {
+            console.log(err)
+            enqueueSnackbar("Failed to load items", { variant: "error" })
+        }
+    }
+
+    useEffect(() => {
+        handleGetItems()
+    }, [])
 
 
 
@@ -38,62 +64,46 @@ function Home() {
                 </Container>
             </Box>
             <Container maxWidth="xl">
-                <Typography variant="h5" my={"2rem"} fontWeight={700} sx={{  borderBottom: "3px dashed " + theme.palette.primary.main, width: "fit-content" }}>Latest Found Items</Typography>
+                <Typography variant="h5" my={"2rem"} fontWeight={700} sx={{ borderBottom: "3px dashed " + theme.palette.primary.main, width: "fit-content" }}>Latest Found Items</Typography>
                 <Grid2 container spacing={2}>
-                    <Grid2 size={{ lg: 4, sm: 6, xs: 12 }}>
-                        <Card sx={{ width: "100%" }}>
-                            <CardMedia
-                                sx={{ height: 200 }}
-                                image="/about_bg.jpg"
-                                title="Background"
-                            />
-                            <CardContent>
-                                <Typography gutterBottom variant="h6" fontWeight={700}>
-                                    Samsung Phone
-                                </Typography>
-                                <Chip label="Phone" icon={<CategoryRounded />} size='small' />
-                            </CardContent>
-                            <CardActions>
-                                <Button size="small" startIcon={<InfoRounded />}>Item Details</Button>
-                            </CardActions>
-                        </Card>
-                    </Grid2>
-                    <Grid2 size={{ lg: 4, sm: 6, xs: 12 }}>
-                        <Card sx={{ width: "100%" }}>
-                            <CardMedia
-                                sx={{ height: 200 }}
-                                image="/about_bg.jpg"
-                                title="Background"
-                            />
-                            <CardContent>
-                                <Typography gutterBottom variant="h6" fontWeight={700}>
-                                    Samsung Phone
-                                </Typography>
-                                <Chip label="Phone" icon={<CategoryRounded />} size='small' />
-                            </CardContent>
-                            <CardActions>
-                                <Button size="small" startIcon={<InfoRounded />}>Item Details</Button>
-                            </CardActions>
-                        </Card>
-                    </Grid2>
-                    <Grid2 size={{ lg: 4, sm: 6, xs: 12 }}>
-                        <Card sx={{ width: "100%" }}>
-                            <CardMedia
-                                sx={{ height: 200 }}
-                                image="/about_bg.jpg"
-                                title="Background"
-                            />
-                            <CardContent>
-                                <Typography gutterBottom variant="h6" fontWeight={700}>
-                                    Samsung Phone
-                                </Typography>
-                                <Chip label="Phone" icon={<CategoryRounded />} size='small' />
-                            </CardContent>
-                            <CardActions>
-                                <Button size="small" startIcon={<InfoRounded />}>Item Details</Button>
-                            </CardActions>
-                        </Card>
-                    </Grid2>
+                    {// If items are loading, show skeleton loaders instead of the items}
+                        loading && [1, 2, 3].map((i) => (
+                            <Grid2 size={{ lg: 4, sm: 6, xs: 12 }} key={i}>
+                                <Card sx={{ width: "100%" }}>
+                                    <Skeleton variant="rectangular" height={200} animation="wave" />
+                                    <CardContent>
+                                        <Stack direction="column" spacing={"0.5rem"}>
+                                            <Skeleton variant="text" width={"15rem"} height={48} animation="wave" />
+                                            <Skeleton variant="text" width={"7rem"} height={24} animation="wave" />
+                                            
+                                        </Stack>
+                                        <Skeleton variant="text" width={"5rem"} height={32} sx={{mt: "1rem"}} animation="wave" />
+                                    </CardContent>
+                                </Card>
+                            </Grid2>
+                        ))}
+                    {// Show first 3 items
+                        items.slice(0, 3).map((item, i) => (
+                            <Grid2 size={{ lg: 4, sm: 6, xs: 12 }} key={i}>
+                                <Card sx={{ width: "100%" }}>
+                                    <CardMedia
+                                        sx={{ height: 200 }}
+                                        image={bucket_url + "/items/" + item.id + "/" + item.attachment.replace(" ", "+")}
+                                        title="Background"
+                                    />
+                                    <CardContent>
+                                        <Typography gutterBottom variant="h6" fontWeight={700}>
+                                            {item.name}
+                                        </Typography>
+                                        <Chip label={item.categoryName} icon={<CategoryRounded />} size='small' />
+                                    </CardContent>
+                                    <CardActions>
+                                        <Button size="small" startIcon={<InfoRounded />}>Item Details</Button>
+                                    </CardActions>
+                                </Card>
+                            </Grid2>
+                        ))}
+                    
                 </Grid2>
             </Container>
         </>

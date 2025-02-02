@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react'
-import { Typography, Stack, IconButton, Button, Divider, Box, CircularProgress, Dialog, AppBar, Toolbar, useMediaQuery, useTheme, DialogContent, Chip, Grid2, TextField, MenuItem, Alert, ButtonBase, Card, CardContent } from '@mui/material'
+import { Typography, Stack, IconButton, Button, Divider, Box, CircularProgress, Dialog, AppBar, Toolbar, useMediaQuery, useTheme, DialogContent, Chip, Grid2, TextField, MenuItem, Alert, ButtonBase, Card, CardContent, CardMedia } from '@mui/material'
 import { useNavigate, Link } from 'react-router-dom';
-import { WarningRounded, CloseRounded, MoreVertRounded, FileDownloadOffRounded, PersonRounded, EditRounded, RefreshRounded, Looks3Rounded, LooksTwoRounded, LooksOneRounded, CheckRounded, AccessTimeRounded, HourglassTopRounded, NewReleasesRounded, SaveRounded, EditOffRounded, UploadFileRounded, InsertDriveFileRounded, DownloadRounded, DeleteRounded } from '@mui/icons-material';
+import { WarningRounded, CloseRounded, MoreVertRounded, FileDownloadOffRounded, PersonRounded, EditRounded, RefreshRounded, Looks3Rounded, LooksTwoRounded, LooksOneRounded, CheckRounded, AccessTimeRounded, HourglassTopRounded, NewReleasesRounded, SaveRounded, EditOffRounded, UploadFileRounded, InsertDriveFileRounded, DownloadRounded, DeleteRounded, CategoryRounded } from '@mui/icons-material';
 import { get, put } from 'aws-amplify/api';
 import UserInfoPopover from './UserInfoPopover';
 import TaskPopover from './TaskPopover';
@@ -11,9 +11,9 @@ import * as Yup from "yup";
 import { LoadingButton } from '@mui/lab';
 import { enqueueSnackbar } from 'notistack';
 
-export default function TaskDialog(props) {
+export default function ItemDialog(props) {
     const navigate = useNavigate()
-    const [task, setTask] = useState(null)
+    const [item, setItem] = useState(null)
     const [loading, setLoading] = useState(true)
     const [attachments, setAttachments] = useState([])
     const [attachmentLoading, setAttachmentLoading] = useState(true)
@@ -27,37 +27,36 @@ export default function TaskDialog(props) {
     const [editLoading, setEditLoading] = useState(false)
     const [editMode, setEditMode] = useState(false)
     const [loadingUploadAttachment, setLoadingUploadAttachment] = useState(false)
+    const [category, setCategory] = useState([])
     const theme = useTheme()
     const api_url = import.meta.env.VITE_API_URL
+    const bucket_url = import.meta.env.VITE_BUCKET_URL
 
     const editFormik = useFormik({
         initialValues: {
-            title: task ? task.task.title : "",
-            description: task ? task.task.description : "",
-            priority: task ? task.task.priority : 1,
-            status: task ? task.task.status : 1
+            name: "",
+            description: "",
+            categoryId: 1,
         },
         validationSchema: Yup.object({
-            title: Yup.string().required("Title is required"),
+            name: Yup.string().required("Item name is required"),
             description: Yup.string().required("Description is required"),
-            priority: Yup.number().required("Priority is required"),
-            status: Yup.number().required("Status is required")
+            categoryId: Yup.number().required("Category is required"),
         }),
         onSubmit: async (values) => {
-            if (values.title != task.task.title || values.description != task.task.description || values.priority != task.task.priority || values.status != task.task.status) {
+            if (values.name != item.name || values.description != item.description || values.categoryId != item.categoryId) {
                 // Perform update
                 setEditLoading(true)
 
                 var data = {
-                    title: values.title,
+                    name: values.name,
                     description: values.description,
-                    priority: values.priority,
-                    status: values.status
+                    categoryId: values.categoryId,
                 }
 
                 var req = put({
                     apiName: "midori",
-                    path: "/tasks/" + props.taskId,
+                    path: "/admin/items/" + props.itemId,
                     options: {
                         body: {
                             ...data
@@ -69,7 +68,7 @@ export default function TaskDialog(props) {
                     var res = await req.response
                     setEditLoading(false)
                     setEditMode(false)
-                    handleGetTask(props.taskId)
+                    handleGetItem(props.itemId)
 
                     // Call onUpdate function if it exists
                     if (props.onUpdate) {
@@ -77,7 +76,7 @@ export default function TaskDialog(props) {
                     }
                 } catch (err) {
                     console.log(err)
-                    enqueueSnackbar("Failed to update task", { variant: "error" })
+                    enqueueSnackbar("Failed to update item", { variant: "error" })
                     setEditLoading(false)
                 }
             } else {
@@ -86,26 +85,25 @@ export default function TaskDialog(props) {
         }
     })
 
-    const handleGetTask = async (id) => {
+    const handleGetItem = async (id) => {
         editMode && setEditMode(false)
         setLoading(true)
         handleGetAttachments(id)
         setError(false)
         var req = get({
             apiName: "midori",
-            path: "/tasks/" + id,
+            path: "/items/" + id,
         })
 
         try {
             var res = await req.response
             var data = await res.body.json()
             console.log(data)
-            setTask(data)
+            setItem(data)
             editFormik.setValues({
-                title: data.task.title,
-                description: data.task.description,
-                priority: data.task.priority,
-                status: data.task.status
+                name: data.name,
+                description: data.description,
+                categoryId: data.categoryId,
             })
             setLoading(false)
         } catch (err) {
@@ -115,11 +113,11 @@ export default function TaskDialog(props) {
         }
     }
 
-     const handleGetAttachments = async (id) => {
+    const handleGetAttachments = async (id) => {
         setAttachmentLoading(true)
         var attachmentsReq = get({
             apiName: "midori",
-            path: "/tasks/" + id + "/attachments",
+            path: "/items/" + id + "/attachments",
         })
 
         try {
@@ -140,39 +138,44 @@ export default function TaskDialog(props) {
         setUserInfoPopoverOpen(true)
     }
 
+    const handleGetCategories = async () => {
+        var itemReq = get({
+            apiName: "midori",
+            path: "/categories",
+        })
+
+        try {
+            var res = await itemReq.response
+            var data = await res.body.json()
+            setCategory(data)
+        } catch (err) {
+            console.log(err)
+            enqueueSnackbar("Failed to load item categories", { variant: "error" })
+        }
+    }
+
     const handleOptionsClick = (e) => {
         setTaskPopoverAnchorEl(e.currentTarget)
         setTaskPopoverOpen(true)
     }
 
     useEffect(() => {
-        if (props.open && props.taskId) {
-            handleGetTask(props.taskId)
+        if (props.open && props.itemId) {
+            handleGetItem(props.itemId)
         }
-
     }, [props.open])
+
+    useEffect(() => {
+        if (editMode) {
+            handleGetCategories()
+        }
+    }, [editMode])
 
     const handleUploadAttachment = (e) => {
         setLoadingPicture(true);
         console.log(e);
         const formData = new FormData();
         formData.append("file", e.target.files[0]);
-        http.post("/user/Upload", formData, { headers: { "Content-Type": "multipart/form-data" } }).then((res) => {
-            if (res.status === 200) {
-                enqueueSnackbar("Profile picture updated successfully!", { variant: "success" });
-                setUser(res.data);
-                setLoadingPicture(false);
-                handleChangePictureDialogClose();
-            } else {
-                enqueueSnackbar("Profile picture update failed!", { variant: "error" });
-                setLoadingPicture(false);
-                handleChangePictureDialogClose();
-            }
-        }).catch((err) => {
-            enqueueSnackbar("Profile picture update failed! " + err.response.data.message, { variant: "error" });
-            setLoadingPicture(false);
-            handleChangePictureDialogClose();
-        })
     }
 
 
@@ -196,20 +199,20 @@ export default function TaskDialog(props) {
                             <CloseRounded />
                         </IconButton>
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                            Task Details
+                            Item Details
                         </Typography>
-                        {(task && !loading && !error && !editMode) && (
+                        {(item && !loading && !error && !editMode) && (
                             <IconButton
                                 edge="end"
                                 color="inherit"
-                                aria-label="Edit Task"
+                                aria-label="Edit Item"
                                 onClick={() => setEditMode(true)}
                                 sx={{ mr: ".5rem" }}
                             >
                                 <EditRounded />
                             </IconButton>
                         )}
-                        {(task && !loading && !error && editMode) && (
+                        {(item && !loading && !error && editMode) && (
                             <>
                                 <LoadingButton
                                     color="inherit"
@@ -230,7 +233,7 @@ export default function TaskDialog(props) {
                                 </Button>
                             </>
                         )}
-                        {(task && !loading && !error) && (
+                        {(item && !loading && !error) && (
                             <>
                                 <IconButton
                                     edge="end"
@@ -248,17 +251,17 @@ export default function TaskDialog(props) {
                     {loading && (
                         <Stack direction={"column"} spacing={2} my={"3rem"} sx={{ justifyContent: "center", alignItems: "center" }}>
                             <CircularProgress />
-                            <Typography variant="body1" color="grey">Loading task details...</Typography>
+                            <Typography variant="body1" color="grey">Loading item details...</Typography>
                         </Stack>
                     )}
                     {(!loading && error) && (
                         <Stack direction={"column"} spacing={2} my={"3rem"} sx={{ justifyContent: "center", alignItems: "center" }}>
                             <WarningRounded sx={{ height: "48px", width: "48px", color: "grey" }} />
-                            <Typography variant="body1" color="grey">Failed to get task</Typography>
-                            <Button variant="secondary" onClick={() => { handleGetTask(props.taskId) }} startIcon={<RefreshRounded />}>Retry</Button>
+                            <Typography variant="body1" color="grey">Failed to get item</Typography>
+                            <Button variant="secondary" onClick={() => { handleGetTask(props.itemId) }} startIcon={<RefreshRounded />}>Retry</Button>
                         </Stack>
                     )}
-                    {(!loading && !error && task) && (
+                    {(!loading && !error && item) && (
                         <>
                             {(editMode) && (
                                 <Alert severity="info" sx={{ mb: "1rem" }}>You are in edit mode. Make sure to save your changes.</Alert>
@@ -267,29 +270,28 @@ export default function TaskDialog(props) {
                                 <Grid2 size={{ xs: 12, sm: 8, md: 9 }}>
                                     {editMode && (
                                         <>
-                                            <Typography variant="body1" fontWeight={700}>Task Title</Typography>
+                                            <Typography variant="body1" fontWeight={700}>Item Name</Typography>
                                             <TextField
                                                 fullWidth
-                                                id="title"
-                                                name="title"
+                                                id="name"
+                                                name="name"
                                                 hiddenLabel
-                                                value={editFormik.values.title}
+                                                value={editFormik.values.name}
                                                 onChange={editFormik.handleChange}
-                                                error={editFormik.touched.title && Boolean(editFormik.errors.title)}
-                                                helperText={editFormik.touched.title && editFormik.errors.title}
+                                                error={editFormik.touched.name && Boolean(editFormik.errors.name)}
+                                                helperText={editFormik.touched.name && editFormik.errors.name}
                                                 sx={{ mb: "0.5rem" }}
                                                 size='small'
                                             />
                                         </>
                                     )}
                                     {!editMode && (
-                                        <Typography variant="h5" fontWeight={700}>{task.task.title}</Typography>
+                                        <Typography variant="h5" fontWeight={700}>{item.name}</Typography>
                                     )}
-                                    <Typography fontSize={"0.75rem"} color='grey'>Created on {task.task.created_at}</Typography>
-                                    <Typography fontSize={"0.75rem"} color='grey'>Last updated on 12/12/2024</Typography>
+                                    <Typography fontSize={"0.75rem"} color='grey'>Created on {item.created_at}</Typography>
                                     <Divider sx={{ my: "0.5rem" }} />
                                     <Box mb={"1rem"}>
-                                        <Typography variant="body1" fontWeight={700}>Description</Typography>
+                                        <Typography variant="body1" fontWeight={700}>Item Description</Typography>
                                         {editMode && (
                                             <TextField
                                                 fullWidth
@@ -310,13 +312,13 @@ export default function TaskDialog(props) {
                                             <>
 
                                                 <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                                                    {task.task.description}
+                                                    {item.description}
                                                 </Typography>
                                             </>
                                         )}
                                     </Box>
                                     <Box>
-                                        <Typography variant="body1" fontWeight={700} mb={"0.5rem"}>Task Attachments</Typography>
+                                        <Typography variant="body1" fontWeight={700} mb={"0.5rem"}>Item Attachments</Typography>
                                         {((!attachments || attachments.length == 0) && !attachmentLoading && !attachmentError) && (
                                             <Stack direction={"column"} spacing={'0.5rem'} py={"2rem"} sx={{ justifyContent: "center", alignItems: "center", borderRadius: "10px", border: "1px solid lightgrey" }}>
                                                 <FileDownloadOffRounded sx={{ height: "32px", width: "32px", color: "grey" }} />
@@ -340,6 +342,11 @@ export default function TaskDialog(props) {
                                             {(attachments && !attachmentLoading) && attachments.map(attachment => (
                                                 <Grid2 size={{ xs: 12, md: 6 }}>
                                                     <Card variant='outlined'>
+                                                        <CardMedia
+                                                            component="img"
+                                                            height="140"
+                                                            src={bucket_url + "/items/" + props.itemId + "/" + attachment.replace(" ", "+")}
+                                                        />
                                                         <CardContent>
                                                             <Box sx={{ display: "flex", alignItems: "center" }}>
                                                                 <InsertDriveFileRounded sx={{ color: "grey", mr: "0.5rem" }} />
@@ -351,7 +358,7 @@ export default function TaskDialog(props) {
                                                                 </Box>
                                                             </Box>
                                                             <Stack direction={"row"} spacing={1} mt={"1rem"}>
-                                                                <IconButton color={theme.palette.primary.main} size='small' LinkComponent={Link} to={api_url + "/tasks/" + props.taskId + "/attachments/" + attachment} target="_blank">
+                                                                <IconButton color={theme.palette.primary.main} size='small' LinkComponent={Link} to={api_url + "/items/" + props.itemId + "/attachments/" + attachment} target="_blank">
                                                                     <DownloadRounded />
                                                                 </IconButton>
                                                                 <IconButton color={theme.palette.primary.main} size='small'>
@@ -369,78 +376,39 @@ export default function TaskDialog(props) {
                                 </Grid2>
                                 <Grid2 size={{ xs: 12, sm: 4, md: 3 }}>
                                     <Grid2 container spacing={2}>
-                                        <Grid2 size={{ xs: 6, sm: 12 }}>
-                                            <Typography variant="body1" fontWeight={700}>Priority</Typography>
+                                        <Grid2 size={{ xs: 12 }}>
+                                            <Typography variant="body1" fontWeight={700}>Category</Typography>
                                             {editMode && (
                                                 <TextField
                                                     select
                                                     fullWidth
-                                                    id="priority"
-                                                    name="priority"
+                                                    id="categoryId"
+                                                    name="categoryId"
                                                     hiddenLabel
-                                                    value={editFormik.values.priority}
+                                                    value={editFormik.values.categoryId}
                                                     onChange={editFormik.handleChange}
-                                                    error={editFormik.touched.priority && Boolean(editFormik.errors.priority)}
-                                                    helperText={editFormik.touched.priority && editFormik.errors.priority}
+                                                    error={editFormik.touched.categoryId && Boolean(editFormik.errors.categoryId)}
+                                                    helperText={editFormik.touched.categoryId && editFormik.errors.categoryId}
                                                     size='small'
 
                                                 >
-                                                    <MenuItem value="1">High</MenuItem>
-                                                    <MenuItem value="2">Medium</MenuItem>
-                                                    <MenuItem value="3">Low</MenuItem>
+                                                    {category.map((cat) => (
+                                                        <MenuItem key={cat.id} value={cat.id}>
+                                                            {cat.name}
+                                                        </MenuItem>
+                                                    ))}
                                                 </TextField>
                                             )}
                                             {!editMode && (
                                                 <>
-                                                    {task.task.priority === 3 && <Chip icon={<Looks3Rounded />} label="Low" color="info" size='small' />}
-                                                    {task.task.priority === 2 && <Chip icon={<LooksTwoRounded />} label="Medium" color="warning" size='small' />}
-                                                    {task.task.priority === 1 && <Chip icon={<LooksOneRounded />} label="High" color="error" size='small' />}
+                                                    <Chip icon={<CategoryRounded />} label={item.categoryName} color="info" size='small' />
                                                 </>
                                             )}
 
                                         </Grid2>
-                                        <Grid2 size={{ xs: 6, sm: 12 }}>
-                                            <Typography variant="body1" fontWeight={700}>Task Status</Typography>
-                                            {editMode && (
-                                                <TextField
-                                                    select
-                                                    fullWidth
-                                                    id="status"
-                                                    name="status"
-                                                    hiddenLabel
-                                                    value={editFormik.values.status}
-                                                    onChange={editFormik.handleChange}
-                                                    error={editFormik.touched.status && Boolean(editFormik.errors.status)}
-                                                    helperText={editFormik.touched.status && editFormik.errors.status}
-                                                    size='small'
-                                                >
-                                                    <MenuItem value="1">To Do</MenuItem>
-                                                    <MenuItem value="2">In Progress</MenuItem>
-                                                    <MenuItem value="3">Pending</MenuItem>
-                                                    <MenuItem value="4">Completed</MenuItem>
-                                                </TextField>
-                                            )}
-                                            {!editMode && (
-                                                <>
-                                                    {task.task.status === 4 && <Chip icon={<CheckRounded />} label="Completed" color="success" size='small' />}
-                                                    {task.task.status === 3 && <Chip icon={<AccessTimeRounded />} label="Pending" color="warning" size='small' />}
-                                                    {task.task.status === 2 && <Chip icon={<HourglassTopRounded />} label="In Progress" color="info" size='small' />}
-                                                    {task.task.status === 1 && <Chip icon={<NewReleasesRounded />} label="To Do" color="info" size='small' />}
-                                                </>
-                                            )}
-                                        </Grid2>
-                                        <Grid2 size={{ xs: 6, sm: 12 }}>
-                                            <Typography variant="body1" fontWeight={700}>Assigned To</Typography>
-                                            <Stack direction={"column"} spacing={1} alignItems={"flex-start"}>
-                                                {task.assignees.length === 0 && <Chip icon={<WarningRounded />} label="No Assignees" size='small' color='warning' />}
-                                                {task.assignees.map(user => (
-                                                    <Chip icon={<PersonRounded />} label={user.username} size='small' onClick={(e) => { handleShowUserInformation(e, user.username) }} />
-                                                ))}
-                                            </Stack>
-                                        </Grid2>
-                                        <Grid2 size={{ xs: 6, sm: 12 }}>
+                                        <Grid2 size={{ xs: 12 }}>
                                             <Typography variant="body1" fontWeight={700}>Created By</Typography>
-                                            <Chip icon={<PersonRounded />} label={task.task.created_by} size='small' onClick={(e) => { handleShowUserInformation(e, task.task.created_by) }} />
+                                            <Chip icon={<PersonRounded />} label={item.created_by} size='small' onClick={(e) => { handleShowUserInformation(e, item.created_by) }} />
                                         </Grid2>
                                     </Grid2>
                                 </Grid2>
@@ -450,7 +418,6 @@ export default function TaskDialog(props) {
                 </DialogContent>
             </Dialog>
             <UserInfoPopover open={UserInfoPopoverOpen} anchor={UserInfoPopoverAnchorEl} onClose={() => setUserInfoPopoverOpen(false)} userId={UserInfoPopoverUserId} />
-            <TaskPopover taskId={props.taskId} open={TaskPopoverOpen} anchorEl={TaskPopoverAnchorEl} onClose={() => setTaskPopoverOpen(false)} onDelete={props.onDelete} />
         </>
 
     )

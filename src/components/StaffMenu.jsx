@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Typography, Stack, IconButton, Button, Menu, ListItem, MenuItem, ListItemIcon, Divider, ListItemText } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
-import { ForestRounded, DeviceThermostatRounded, SettingsRounded, AddRounded, GrassRounded, InfoRounded, GroupRounded, PersonAddRounded, MapRounded, DashboardRounded, TaskAlt, TaskAltRounded, WarningRounded, FlagRounded, CategoryRounded } from '@mui/icons-material';
+import { SettingsRounded, AddRounded, InfoRounded, GroupRounded, PersonAddRounded, FlagRounded, CategoryRounded, HomeRounded } from '@mui/icons-material';
 
 export default function StaffMenu(props) {
     const navigate = useNavigate()
@@ -109,9 +109,9 @@ export default function StaffMenu(props) {
             >
                 <MenuItem onClick={() => navigate("/staff")}>
                     <ListItemIcon>
-                        <DashboardRounded />
+                        <HomeRounded />
                     </ListItemIcon>
-                    <ListItemText primary="Operations Overview" sx={{marginRight: "2rem"}} />
+                    <ListItemText primary="Home Dashboard" sx={{marginRight: "2rem"}} />
                     <Typography variant="caption" color="text.secondary">Ctrl + Alt + O</Typography>
                 </MenuItem>
                 <Divider />
@@ -119,7 +119,7 @@ export default function StaffMenu(props) {
                     <ListItemIcon>
                         <FlagRounded />
                     </ListItemIcon>
-                    <ListItemText primary="Manage Items" />
+                    <ListItemText primary="Manage Items" sx={{marginRight: "2rem"}}/>
                     <Typography variant="caption" color="text.secondary">Ctrl + Alt + I</Typography>
                 </MenuItem>
                 <MenuItem onClick={() => navigate("/staff/items/create")}>
