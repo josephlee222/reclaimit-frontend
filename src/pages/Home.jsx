@@ -7,6 +7,7 @@ import titleHelper from '../functions/helpers';
 import { useSnackbar } from "notistack";
 import CardTitle from '../components/CardTitle';
 import { get } from 'aws-amplify/api';
+import ItemDialog from '../components/ItemDialog';
 
 
 function Home() {
@@ -16,6 +17,8 @@ function Home() {
     const apiUrl = import.meta.env.VITE_API_URL;
     const [banners, setBanners] = useState({})
     const [loading, setLoading] = useState(false)
+    const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
+    const [detailsId, setDetailsId] = useState(null)
     const { enqueueSnackbar } = useSnackbar();
     const [items, setItems] = useState([])
     const theme = useTheme()
@@ -38,6 +41,15 @@ function Home() {
             console.log(err)
             enqueueSnackbar("Failed to load items", { variant: "error" })
         }
+    }
+
+    const handleDetailsClose = () => {
+        setDetailsDialogOpen(false)
+    }
+
+    const handleDetailsOpen = (id) => {
+        setDetailsId(id)
+        setDetailsDialogOpen(true)
     }
 
     useEffect(() => {
@@ -65,7 +77,7 @@ function Home() {
             </Box>
             <Container maxWidth="xl">
                 <Typography variant="h5" my={"2rem"} fontWeight={700} sx={{ borderBottom: "3px dashed " + theme.palette.primary.main, width: "fit-content" }}>Latest Found Items</Typography>
-                <Grid2 container spacing={2}>
+                <Grid2 container spacing={2} sx={{ mb: "1rem"}}>
                     {// If items are loading, show skeleton loaders instead of the items}
                         loading && [1, 2, 3].map((i) => (
                             <Grid2 size={{ lg: 4, sm: 6, xs: 12 }} key={i}>
@@ -98,7 +110,9 @@ function Home() {
                                         <Chip label={item.categoryName} icon={<CategoryRounded />} size='small' />
                                     </CardContent>
                                     <CardActions>
-                                        <Button size="small" startIcon={<InfoRounded />}>Item Details</Button>
+                                        <Button size="medium" startIcon={<InfoRounded />} onClick={() => {
+                                            handleDetailsOpen(item.id)
+                                        }}>Item Details</Button>
                                     </CardActions>
                                 </Card>
                             </Grid2>
@@ -106,6 +120,7 @@ function Home() {
                     
                 </Grid2>
             </Container>
+            <ItemDialog open={detailsDialogOpen} onClose={handleDetailsClose} itemId={detailsId} guestMode />
         </>
     )
 }

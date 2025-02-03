@@ -201,7 +201,7 @@ export default function ItemDialog(props) {
                         <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
                             Item Details
                         </Typography>
-                        {(item && !loading && !error && !editMode) && (
+                        {(item && !loading && !error && !editMode && !props.guestMode) && (
                             <IconButton
                                 edge="end"
                                 color="inherit"
@@ -231,18 +231,6 @@ export default function ItemDialog(props) {
                                 >
                                     Cancel
                                 </Button>
-                            </>
-                        )}
-                        {(item && !loading && !error) && (
-                            <>
-                                <IconButton
-                                    edge="end"
-                                    color="inherit"
-                                    aria-label="More Options"
-                                    onClick={handleOptionsClick}
-                                >
-                                    <MoreVertRounded />
-                                </IconButton>
                             </>
                         )}
                     </Toolbar>
@@ -361,9 +349,11 @@ export default function ItemDialog(props) {
                                                                 <IconButton color={theme.palette.primary.main} size='small' LinkComponent={Link} to={api_url + "/items/" + props.itemId + "/attachments/" + attachment} target="_blank">
                                                                     <DownloadRounded />
                                                                 </IconButton>
-                                                                <IconButton color={theme.palette.primary.main} size='small'>
-                                                                    <DeleteRounded />
-                                                                </IconButton>
+                                                                {!props.guestMode && (
+                                                                    <IconButton color={theme.palette.primary.main} size='small'>
+                                                                        <DeleteRounded />
+                                                                    </IconButton>
+                                                                )}
                                                             </Stack>
                                                         </CardContent>
                                                     </Card>
@@ -371,7 +361,9 @@ export default function ItemDialog(props) {
                                             )
                                             )}
                                         </Grid2>
-                                        <LoadingButton loading={attachmentLoading} component="label" variant="secondary" startIcon={<UploadFileRounded />} fullWidth size='small' sx={{ mt: "0.5rem" }}>Upload Attachment<input type='file' onChange={handleUploadAttachment} hidden /></LoadingButton>
+                                        {!props.guestMode && (
+                                            <LoadingButton loading={attachmentLoading} component="label" variant="secondary" startIcon={<UploadFileRounded />} fullWidth size='small' sx={{ mt: "0.5rem" }}>Upload Attachment<input type='file' onChange={handleUploadAttachment} hidden /></LoadingButton>
+                                        )}
                                     </Box>
                                 </Grid2>
                                 <Grid2 size={{ xs: 12, sm: 4, md: 3 }}>
