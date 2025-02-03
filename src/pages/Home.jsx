@@ -100,7 +100,7 @@ function Home() {
                                 <Card sx={{ width: "100%" }}>
                                     <CardMedia
                                         sx={{ height: 200, backgroundColor: "darkgrey", objectFit: "contain" }}
-                                        image={bucket_url + "/items/" + item.id + "/" + item.attachment.replace(" ", "+")}
+                                        image={item.attachment ? bucket_url + "/items/" + item.id + "/" + item.attachment.replace(" ", "+") : "/icon.png"}
                                         title="Background"
                                         component={"img"}
                                     />
