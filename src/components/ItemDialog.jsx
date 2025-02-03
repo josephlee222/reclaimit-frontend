@@ -202,15 +202,7 @@ export default function ItemDialog(props) {
                             Item Details
                         </Typography>
                         {(item && !loading && !error && !editMode && !props.guestMode) && (
-                            <IconButton
-                                edge="end"
-                                color="inherit"
-                                aria-label="Edit Item"
-                                onClick={() => setEditMode(true)}
-                                sx={{ mr: ".5rem" }}
-                            >
-                                <EditRounded />
-                            </IconButton>
+                            <Button onClick={() => setEditMode(true)} startIcon={<EditRounded />} color="inherit">Edit</Button>
                         )}
                         {(item && !loading && !error && editMode) && (
                             <>
@@ -276,7 +268,16 @@ export default function ItemDialog(props) {
                                     {!editMode && (
                                         <Typography variant="h5" fontWeight={700}>{item.name}</Typography>
                                     )}
-                                    <Typography fontSize={"0.75rem"} color='grey'>Created on {item.created_at}</Typography>
+                                    <Typography fontSize={"0.75rem"} color='grey'>Created on {
+                                        new Date(item.created_at).toLocaleDateString("en-US", {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        }) + " " + new Date(item.created_at).toLocaleTimeString("en-US", {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })
+                                    }</Typography>
                                     <Divider sx={{ my: "0.5rem" }} />
                                     <Box mb={"1rem"}>
                                         <Typography variant="body1" fontWeight={700}>Item Description</Typography>
@@ -332,8 +333,9 @@ export default function ItemDialog(props) {
                                                     <Card variant='outlined'>
                                                         <CardMedia
                                                             component="img"
-                                                            height="140"
+                                                            height="150"
                                                             src={bucket_url + "/items/" + props.itemId + "/" + attachment.replace(" ", "+")}
+                                                            sx={{ backgroundColor: "lightgrey", objectFit: "contain" }}
                                                         />
                                                         <CardContent>
                                                             <Box sx={{ display: "flex", alignItems: "center" }}>

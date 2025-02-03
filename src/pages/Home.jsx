@@ -99,9 +99,10 @@ function Home() {
                             <Grid2 size={{ lg: 4, sm: 6, xs: 12 }} key={i}>
                                 <Card sx={{ width: "100%" }}>
                                     <CardMedia
-                                        sx={{ height: 200 }}
+                                        sx={{ height: 200, backgroundColor: "darkgrey", objectFit: "contain" }}
                                         image={bucket_url + "/items/" + item.id + "/" + item.attachment.replace(" ", "+")}
                                         title="Background"
+                                        component={"img"}
                                     />
                                     <CardContent>
                                         <Typography gutterBottom variant="h6" fontWeight={700}>

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState, Suspense, useRef, useLayoutEffect } fr
 import { Route, Routes, Navigate, Link } from 'react-router-dom'
 import { Button, Container, Divider, Typography, Box, Card, TextField, Skeleton, CardContent, CardMedia, Chip, Alert, Collapse, Grid, Stack, Grid2, useTheme, CardActions, Badge } from '@mui/material'
 import { AppContext } from '../App';
-import { CategoryRounded, CloseRounded, HomeRounded, InfoRounded, LoginRounded, NewReleasesRounded, RefreshRounded, SearchRounded, WarningRounded } from '@mui/icons-material';
+import { CategoryRounded, CloseRounded, HomeRounded, InfoRounded, LoginRounded, NewReleasesRounded, NotificationAddRounded, RefreshRounded, SearchRounded, WarningRounded } from '@mui/icons-material';
 import titleHelper from '../functions/helpers';
 import { useSnackbar } from "notistack";
 import { LoadingButton } from '@mui/lab';
@@ -116,9 +116,10 @@ export default function ViewItems() {
 
                         <Divider sx={{ mb: "1rem" }} />
                     </Box>
-                    <Box display={"flex"}>
+                    <Stack direction="row" spacing={"0.5rem"} flexWrap={"wrap"} useFlexGap>
+                        <Button variant="contained" startIcon={<NotificationAddRounded />}>Subscribe...</Button>
                         <LoadingButton loadingPosition='start' variant="outlined" startIcon={<RefreshRounded />} onClick={handleGetItems} loading={loading}>Refresh</LoadingButton>
-                    </Box>
+                    </Stack>
                     <Grid2 container spacing={2} sx={{ mt: "1rem" }}>
                         <Grid2 size={{ md: 3, xs: 12 }}>
                             <Card>
@@ -180,9 +181,11 @@ export default function ViewItems() {
                                         <Grid2 size={{ lg: 4, sm: 6, xs: 12 }} key={i}>
                                             <Card sx={{ width: "100%" }}>
                                                 <CardMedia
-                                                    sx={{ height: 200 }}
+                                                    sx={{ height: 200, backgroundColor: "darkgrey", objectFit: "contain" }}
                                                     image={bucket_url + "/items/" + item.id + "/" + item.attachment.replace(" ", "+")}
                                                     title="Background"
+                                                    objectFit="contain"
+                                                    component={"img"}
                                                 />
                                                 <CardContent>
                                                     <Typography gutterBottom variant="h6" fontWeight={700}>
