@@ -30,8 +30,8 @@ function About() {
                         <CardMedia
                             component="img"
                             height="250"
-                            image="/about_bg.jpg"
-                            alt="Material Forest"
+                            image="/about_bg_new.jpg"
+                            alt="Material Grey"
                         />
                     </div>
                     <CardContent>
