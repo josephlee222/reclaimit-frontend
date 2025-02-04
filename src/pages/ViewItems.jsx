@@ -160,7 +160,7 @@ export default function ViewItems() {
                         <Grid2 size={{ md: 9, xs: 12 }}>
                             <Grid2 container spacing={2}>
                                 {// If items are loading, show skeleton loaders instead of the items}
-                                    loading && [1, 2, 3].map((i) => (
+                                    loading && [1, 2, 3, 4, 5, 6].map((i) => (
                                         <Grid2 size={{ lg: 4, sm: 6, xs: 12 }} key={i}>
                                             <Card sx={{ width: "100%" }}>
                                                 <Skeleton variant="rectangular" height={200} animation="wave" />

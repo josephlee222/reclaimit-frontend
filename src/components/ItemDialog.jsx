@@ -1,15 +1,16 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useState } from 'react'
-import { Typography, Stack, IconButton, Button, Divider, Box, CircularProgress, Dialog, AppBar, Toolbar, useMediaQuery, useTheme, DialogContent, Chip, Grid2, TextField, MenuItem, Alert, ButtonBase, Card, CardContent, CardMedia } from '@mui/material'
+import { Typography, Stack, IconButton, Button, Divider, Box, CircularProgress, Dialog, AppBar, Toolbar, useMediaQuery, useTheme, DialogContent, Chip, Grid2, TextField, MenuItem, Alert, ButtonBase, Card, CardContent, CardMedia, DialogContentText, DialogActions, DialogTitle } from '@mui/material'
 import { useNavigate, Link } from 'react-router-dom';
 import { WarningRounded, CloseRounded, MoreVertRounded, FileDownloadOffRounded, PersonRounded, EditRounded, RefreshRounded, Looks3Rounded, LooksTwoRounded, LooksOneRounded, CheckRounded, AccessTimeRounded, HourglassTopRounded, NewReleasesRounded, SaveRounded, EditOffRounded, UploadFileRounded, InsertDriveFileRounded, DownloadRounded, DeleteRounded, CategoryRounded } from '@mui/icons-material';
-import { get, put } from 'aws-amplify/api';
+import { del, get, put } from 'aws-amplify/api';
 import UserInfoPopover from './UserInfoPopover';
 import TaskPopover from './TaskPopover';
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { LoadingButton } from '@mui/lab';
 import { enqueueSnackbar } from 'notistack';
+import { FilePond } from 'react-filepond';
 
 export default function ItemDialog(props) {
     const navigate = useNavigate()
@@ -27,7 +28,14 @@ export default function ItemDialog(props) {
     const [editLoading, setEditLoading] = useState(false)
     const [editMode, setEditMode] = useState(false)
     const [loadingUploadAttachment, setLoadingUploadAttachment] = useState(false)
+    const [deleteAttachment, setDeleteAttachment] = useState(null)
+    const [deleteAttachmentOpen, setDeleteAttachmentOpen] = useState(false)
+    const [deleteAttachmentLoading, setDeleteAttachmentLoading] = useState(false)
     const [category, setCategory] = useState([])
+    const [filepondUrl, setFilepondUrl] = useState(null)
+    const [filepondToken, setFilepondToken] = useState(null)
+    const [newItemFiles, setNewItemFiles] = useState([])
+    const filepondRef = useRef(null)
     const theme = useTheme()
     const api_url = import.meta.env.VITE_API_URL
     const bucket_url = import.meta.env.VITE_BUCKET_URL
@@ -159,9 +167,42 @@ export default function ItemDialog(props) {
         setTaskPopoverOpen(true)
     }
 
+    const handleDeleteAttachment = async () => {
+        setDeleteAttachmentLoading(true)
+
+        // /admin/items/{id}/attachments/{filename}
+        var req = del({
+            apiName: "midori",
+            path: "/admin/items/" + props.itemId + "/attachments/" + deleteAttachment,
+        })
+
+        try {
+            var res = await req.response
+            setDeleteAttachmentLoading(false)
+            handleGetAttachments(props.itemId)
+            handleDeleteAttachmentClose()
+            enqueueSnackbar("Attachment deleted", { variant: "success" })
+        } catch (err) {
+            console.log(err)
+            setDeleteAttachmentLoading(false)
+            enqueueSnackbar("Failed to delete attachment", { variant: "error" })
+        }
+    }
+
+    const handleDeleteAttachmentOpen = (filename) => {
+        setDeleteAttachment(filename)
+        setDeleteAttachmentOpen(true)
+    }
+
+    const handleDeleteAttachmentClose = () => {
+        setDeleteAttachmentOpen(false)
+    }
+
     useEffect(() => {
         if (props.open && props.itemId) {
             handleGetItem(props.itemId)
+            setFilepondToken(localStorage.getItem("token"))
+            setFilepondUrl(api_url + "/admin/items/" + props.itemId + "/attachments")
         }
     }, [props.open])
 
@@ -170,14 +211,6 @@ export default function ItemDialog(props) {
             handleGetCategories()
         }
     }, [editMode])
-
-    const handleUploadAttachment = (e) => {
-        setLoadingPicture(true);
-        console.log(e);
-        const formData = new FormData();
-        formData.append("file", e.target.files[0]);
-    }
-
 
     return (
         <>
@@ -327,7 +360,7 @@ export default function ItemDialog(props) {
                                                 <Typography variant="body1" color="grey">Loading attachments...</Typography>
                                             </Stack>
                                         )}
-                                        <Grid2 container spacing={1}>
+                                        <Grid2 container spacing={1} mb={"1rem"}>
                                             {(attachments && !attachmentLoading) && attachments.map(attachment => (
                                                 <Grid2 size={{ xs: 12, md: 6 }}>
                                                     <Card variant='outlined'>
@@ -352,7 +385,7 @@ export default function ItemDialog(props) {
                                                                     <DownloadRounded />
                                                                 </IconButton>
                                                                 {!props.guestMode && (
-                                                                    <IconButton color={theme.palette.primary.main} size='small'>
+                                                                    <IconButton color={theme.palette.primary.main} size='small' onClick={() => handleDeleteAttachmentOpen(attachment)}>
                                                                         <DeleteRounded />
                                                                     </IconButton>
                                                                 )}
@@ -364,7 +397,43 @@ export default function ItemDialog(props) {
                                             )}
                                         </Grid2>
                                         {!props.guestMode && (
-                                            <LoadingButton loading={attachmentLoading} component="label" variant="secondary" startIcon={<UploadFileRounded />} fullWidth size='small' sx={{ mt: "0.5rem" }}>Upload Attachment<input type='file' onChange={handleUploadAttachment} hidden /></LoadingButton>
+                                            <FilePond
+                                                ref={filepondRef}
+                                                files={newItemFiles}
+                                                allowMultiple={true}
+                                                maxFiles={3}
+                                                onupdatefiles={(fileItems) => {
+                                                    setNewItemFiles(fileItems.map((fileItem) => fileItem.file));
+                                                }}
+                                                onprocessfiles={(error, file) => {
+                                                    if (error) {
+                                                        console.log(error);
+                                                        enqueueSnackbar("Failed to upload attachments", { variant: "error" })
+                                                    } else {
+                                                        console.log(file);
+                                                        handleGetAttachments(props.itemId)
+                                                        setNewItemFiles([])
+                                                        enqueueSnackbar("Attachments uploaded", { variant: "success" })
+                                                    }
+                                                }}
+                                                credits={false}
+                                                instantUpload={true}
+                                                allowRevert={false}
+                                                allowProcess={true}
+                                                allowReplace={false}
+                                                allowReorder={true}
+                                                acceptedFileTypes={['image/*']}
+                                                imagePreviewMaxHeight={200}
+                                                server={{
+                                                    url: filepondUrl,
+                                                    process: {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            Authorization: filepondToken
+                                                        },
+                                                    },
+                                                }}
+                                            ></FilePond>
                                         )}
                                     </Box>
                                 </Grid2>
@@ -410,6 +479,36 @@ export default function ItemDialog(props) {
                         </>
                     )}
                 </DialogContent>
+            </Dialog>
+            <Dialog
+                open={deleteAttachmentOpen}
+                onClose={handleDeleteAttachmentClose}
+                fullWidth
+            >
+                <DialogTitle>
+                    Delete Attachment
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this attachment?
+                        <br />
+                        Filename: {deleteAttachment}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteAttachmentClose} color="primary" startIcon={<CloseRounded />}>
+                        Cancel
+                    </Button>
+                    <LoadingButton
+                        color="error"
+                        onClick={handleDeleteAttachment}
+                        loading={deleteAttachmentLoading}
+                        startIcon={<DeleteRounded />}
+                        loadingPosition='start'
+                    >
+                        Delete
+                    </LoadingButton>
+                </DialogActions>
             </Dialog>
             <UserInfoPopover open={UserInfoPopoverOpen} anchor={UserInfoPopoverAnchorEl} onClose={() => setUserInfoPopoverOpen(false)} userId={UserInfoPopoverUserId} />
         </>
