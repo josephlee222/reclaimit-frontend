@@ -48,7 +48,7 @@ export default function Navbar() {
                         {(!user && !userLoading) && <Button LinkComponent={Link} variant="text" color="inherit" to="/login" startIcon={<LoginIcon />}>Login</Button>}
                         {/* {user && <NavbarCart />}
                         {user && <NavbarFriends />} */}
-                        {user && <NavbarNotifications />}
+                        {/* {user && <NavbarNotifications />} */}
                         {user && <NavbarProfile />}
                     </Box>
 

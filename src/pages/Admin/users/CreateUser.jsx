@@ -122,8 +122,8 @@ function CreateUser() {
                                         helperText={formik.touched.group && formik.errors.group}
                                     >
                                         <MenuItem value="normal">Non-Staff</MenuItem>
-                                        <MenuItem value="farmer">Farmer</MenuItem>
-                                        <MenuItem value="farmManager">Farm Manager</MenuItem>
+                                        {/* <MenuItem value="farmer">Farmer</MenuItem>
+                                        <MenuItem value="farmManager">Farm Manager</MenuItem> */}
                                         <MenuItem value="admin">Admin</MenuItem>
                                     </TextField>
                                 </Grid>

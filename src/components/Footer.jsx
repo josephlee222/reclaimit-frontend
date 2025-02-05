@@ -11,10 +11,8 @@ function Footer() {
     return (
         <>
             <Divider />
-            <Box sx={{
-
-            }}>
-                <Container
+            <Box>
+                {/* <Container
                     maxWidth="xl"
                     sx={{
                         marginY: "1rem",
@@ -30,7 +28,7 @@ function Footer() {
                             </Stack>
                         </Grid>
                         <Grid item xs={12} lg={6}>
-                            <Stack spacing={2} direction={"row"} justifyContent={{xs: "center", md: "start"}} color={"primary.main"}>
+                            <Stack spacing={2} direction={"row"} justifyContent={{ xs: "center", md: "start" }} color={"primary.main"}>
                                 <Box display={"flex"} alignItems={"center"}>
                                     <EmailRounded sx={{ marginRight: "1rem" }} />
                                     <Box>
@@ -53,7 +51,7 @@ function Footer() {
                         </Grid>
                     </Grid>
 
-                </Container>
+                </Container> */}
                 <Box sx={{ textAlign: "center", margin: "1rem" }}>
                     <Link to="/about" style={{ textDecoration: "none", color: "inherit" }}>
                         <Typography color={"inherit"} sx={{ textAlign: "center", opacity: "0.5" }} >ReclaimIt - Joseph Lee - 2025</Typography>

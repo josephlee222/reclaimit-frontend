@@ -122,7 +122,7 @@ export default function StaffMenu(props) {
                     <ListItemText primary="Manage Items" sx={{marginRight: "2rem"}}/>
                     <Typography variant="caption" color="text.secondary">Ctrl + Alt + I</Typography>
                 </MenuItem>
-                <MenuItem onClick={() => navigate("/staff/items/create")}>
+                <MenuItem onClick={() => navigate("/staff/items?new=true")}>
                     <ListItemIcon>
                         <AddRounded />
                     </ListItemIcon>

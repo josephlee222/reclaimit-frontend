@@ -25,6 +25,7 @@ function App() {
     const [connection, setConnection] = useState(null);
     const [title, setTitle] = useState(document.title);
     const [icon, setIcon] = useState(() => Home);
+    const [token, setToken] = useState(null);
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
@@ -58,6 +59,7 @@ function App() {
             });
 
             localStorage.setItem("token", token);
+            setToken(token);
         }).catch((e) => {
             console.log(e);
         });
@@ -84,6 +86,8 @@ function App() {
                 setIcon,
                 currentNotification,
                 setCurrentNotification,
+                token,
+                setToken
             }}>
                 <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", minWidth: "100%" }}>
                     <Navbar />

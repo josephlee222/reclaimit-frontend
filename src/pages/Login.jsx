@@ -37,7 +37,7 @@ export default function Login() {
     const [verifyLoading, setVerifyLoading] = useState(false);
     const [loginType, setLoginType] = useState("email");
     const { enqueueSnackbar } = useSnackbar();
-    const { setUser, setConnection, setNotifications, setUserRoles } = useContext(AppContext);
+    const { setUser, setConnection, setNotifications, setUserRoles, setToken } = useContext(AppContext);
     const navigate = useNavigate();
     const theme = useTheme();
     titleHelper("Login");
@@ -355,6 +355,8 @@ export default function Login() {
                             }
                         }
                     });
+                    localStorage.setItem("token", token);
+                    setToken(token);
                     enqueueSnackbar("Login successful. Welcome back!", { variant: "success" });
                     navigate("/")
                 }).catch((e) => {

@@ -72,7 +72,7 @@ export default function AdminUsersRoutes() {
                     >
                         <Tab icon={<List />} iconPosition="start" label="User List" />
                         <Tab icon={<PersonAddIcon />} iconPosition="start" label="Create User" />
-                        <Tab icon={<CellTowerRounded />} iconPosition="start" label="Broadcast" />
+                        {/* <Tab icon={<CellTowerRounded />} iconPosition="start" label="Broadcast" /> */}
                     </Tabs>
                 </Box>
                 <Routes>
