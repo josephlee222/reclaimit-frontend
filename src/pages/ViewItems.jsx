@@ -381,7 +381,6 @@ export default function ViewItems() {
                             sx={{ mt: "1rem" }}
                             multiple
                             fullWidth
-                            autoComplete
                             value={subscribeFormik.values.categoryIds}
                             onChange={(e) => {
                                 subscribeFormik.setFieldValue("categoryIds", e.target.value)
